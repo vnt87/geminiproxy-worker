@@ -1,60 +1,62 @@
-# Gemini API Proxy Worker for Cloudflare
+[Tiếng Việt](README.md) | [English](README.en.md)
 
-This project implements a Cloudflare Worker that acts as a reverse proxy for Google's Gemini API. It provides automatic API key rotation using Cloudflare KV store for persistence.
+# Gemini API Proxy Worker cho Cloudflare
 
-This is a TypeScript conversion of the original Go-based `geminiproxy` project, adapted to run on Cloudflare's serverless edge network.
+Dự án này triển khai một Cloudflare Worker hoạt động như một reverse proxy cho Gemini API của Google. Nó cung cấp tính năng tự động xoay vòng API key sử dụng Cloudflare KV store để lưu trữ.
 
-## Repository
+Đây là phiên bản chuyển đổi từ TypeScript của dự án `geminiproxy` gốc dựa trên Go, được điều chỉnh để chạy trên mạng lưới edge serverless của Cloudflare.
 
-This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
+## Repository (Kho Mã Nguồn)
 
-## Features
+Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-worker.git
 
--   Proxies requests to the Gemini API (`generativelanguage.googleapis.com`).
--   Automatically rotates through multiple Gemini API keys in a round-robin fashion.
--   API keys are stored securely in Cloudflare KV.
--   Stateless architecture suitable for Cloudflare Workers.
--   Transparent to clients – they make requests to the Worker URL as if it were the Gemini API (after initial setup).
--   LiteLLM compatibility (removes `Authorization` header).
+## Features (Tính Năng)
 
-## Prerequisites
+-   Proxy các yêu cầu đến Gemini API (`generativelanguage.googleapis.com`).
+-   Tự động xoay vòng qua nhiều API key của Gemini theo kiểu round-robin.
+-   API key được lưu trữ an toàn trong Cloudflare KV.
+-   Kiến trúc stateless phù hợp với Cloudflare Workers.
+-   Minh bạch với client – client gửi yêu cầu đến URL của Worker như thể đó là Gemini API (sau khi thiết lập ban đầu).
+-   Tương thích với LiteLLM (loại bỏ header `Authorization`).
 
--   A Cloudflare account.
--   `npm` and `Node.js` installed.
--   Wrangler CLI installed (`npm install -g wrangler`).
--   One or more Gemini API keys.
+## Prerequisites (Điều Kiện Tiên Quyết)
 
-## Setup
+-   Một tài khoản Cloudflare.
+-   Đã cài đặt `npm` và `Node.js`.
+-   Đã cài đặt Wrangler CLI (`npm install -g wrangler`).
+-   Một hoặc nhiều API key của Gemini.
 
-1.  **Clone the Repository**:
+## Setup (Cài Đặt)
+
+1.  **Clone Repository (Sao Chép Kho Mã Nguồn)**:
     ```bash
     git clone https://github.com/vnt87/gemini-proxy-worker.git
     cd gemini-proxy-worker
     ```
-    *(If you are initializing this project from existing local files and want to connect to this remote, use `git remote add origin https://github.com/vnt87/gemini-proxy-worker.git` after `git init`)*
+    *(Nếu bạn đang khởi tạo dự án này từ các tệp cục bộ hiện có và muốn kết nối với kho mã nguồn từ xa này, hãy sử dụng `git remote add origin https://github.com/vnt87/gemini-proxy-worker.git` sau khi `git init`)*
 
-2.  **Install Dependencies:**
+2.  **Install Dependencies (Cài Đặt Các Gói Phụ Thuộc):**
     ```bash
     npm install
     ```
 
-3.  **Create KV Namespace:**
-    In your terminal, run:
+3.  **Create KV Namespace (Tạo Namespace KV):**
+    Trong terminal của bạn, chạy lệnh:
     ```bash
     wrangler kv:namespace create GEMINI_KEYS
     ```
-    This command will output an `id`. Note this ID.
+    Lệnh này sẽ xuất ra một `id`. Ghi lại ID này.
 
-4.  **Configure `wrangler.toml`:**
-    Open `wrangler.toml` and update the `kv_namespaces` section with the `id` you obtained:
+4.  **Configure `wrangler.toml` (Cấu Hình `wrangler.toml`):**
+    Mở tệp `wrangler.toml` và cập nhật phần `kv_namespaces` với `id` bạn đã nhận được:
     ```toml
     kv_namespaces = [
-      { binding = "GEMINI_KEYS", id = "YOUR_ACTUAL_KV_NAMESPACE_ID" }
+      { binding = "GEMINI_KEYS", id = "YOUR_ACTUAL_KV_NAMESPACE_ID" } # Thay YOUR_ACTUAL_KV_NAMESPACE_ID bằng ID thực tế của bạn
     ]
     ```
 
-5.  **Prepare and Upload API Keys:**
-    a.  Create a JSON file named `gemini-keys.json` (or use `gemini-keys.json.example` as a template) in the `geminiproxy-worker` directory. It should contain your Gemini API keys:
+5.  **Prepare and Upload API Keys (Chuẩn Bị và Tải Lên API Keys):**
+    a.  Tạo một tệp JSON có tên `gemini-keys.json` (hoặc sử dụng `gemini-keys.json.example` làm mẫu) trong thư mục `geminiproxy-worker`. Tệp này nên chứa các API key Gemini của bạn:
         ```json
         // gemini-keys.json
         {
@@ -65,47 +67,61 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
           ]
         }
         ```
-        **Important:** Ensure `gemini-keys.json` is listed in your `.gitignore` file to prevent committing your actual keys. A `gemini-keys.json.example` is provided.
+        **Quan trọng:** Đảm bảo `gemini-keys.json` được liệt kê trong tệp `.gitignore` của bạn để tránh commit các key thực tế. Một tệp `gemini-keys.json.example` được cung cấp.
 
-    b.  Upload this file to your KV namespace. The key manager expects the keys to be stored under the KV key `GEMINI_API_KEYS_CONFIG`.
+    b.  Tải tệp này lên namespace KV của bạn. Trình quản lý key mong đợi các key được lưu trữ dưới key KV `GEMINI_API_KEYS_CONFIG`.
         ```bash
         wrangler kv:key put --binding=GEMINI_KEYS "GEMINI_API_KEYS_CONFIG" --path="./gemini-keys.json"
         ```
-        *Note: Ensure `wrangler.toml` is correctly configured with the `GEMINI_KEYS` binding before running this.*
+        *Lưu ý: Đảm bảo `wrangler.toml` được cấu hình chính xác với binding `GEMINI_KEYS` trước khi chạy lệnh này.*
 
-## Usage
+## Usage (Sử Dụng)
 
-### Local Development
+### Local Development (Phát Triển Cục Bộ)
 
-To test the Worker locally:
+Để kiểm tra Worker cục bộ:
 ```bash
 wrangler dev
 ```
-This will start a local server (typically `http://localhost:8787`). You can send requests to this endpoint as if it were the Gemini API. For example, if the Gemini API endpoint is `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`, you would send your request to `http://localhost:8787/v1beta/models/gemini-pro:generateContent`.
+Lệnh này sẽ khởi động một máy chủ cục bộ (thường là `http://localhost:8787`). Bạn có thể gửi yêu cầu đến điểm cuối này như thể đó là Gemini API. Ví dụ, nếu điểm cuối Gemini API là `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`, bạn sẽ gửi yêu cầu của mình đến `http://localhost:8787/v1beta/models/gemini-pro:generateContent`.
 
-The Worker will append the rotated API key to the request.
+Worker sẽ nối thêm API key được xoay vòng vào yêu cầu.
 
-### Deployment
+### Deployment (Triển Khai)
 
-To deploy the Worker to your Cloudflare account:
+Để triển khai Worker lên tài khoản Cloudflare của bạn:
 ```bash
 wrangler deploy
 ```
-After deployment, Wrangler will provide you with the URL of your deployed Worker (e.g., `https://geminiproxy-worker.<your-subdomain>.workers.dev`). Use this URL as your Gemini API endpoint in your client applications.
+Sau khi triển khai, Wrangler sẽ cung cấp cho bạn URL của Worker đã triển khai (ví dụ: `https://geminiproxy-worker.<your-subdomain>.workers.dev`). Sử dụng URL này làm điểm cuối Gemini API trong các ứng dụng client của bạn.
 
-## How It Works
+## Debugging (Gỡ Lỗi)
 
-1.  A client sends a request to the Cloudflare Worker URL.
-2.  The Worker's `fetch` handler receives the request.
-3.  The `KeyManager` retrieves the list of API keys and the current rotation index from the `GEMINI_KEYS` KV namespace.
-4.  It selects the next API key in a round-robin fashion and updates the index in KV for the next request.
-5.  The Worker forwards the original request to the actual Gemini API endpoint (`https://generativelanguage.googleapis.com`), appending the selected API key as a query parameter.
-6.  The response from the Gemini API is streamed back to the client through the Worker.
+Để xem log thời gian thực từ worker đã triển khai của bạn:
+```bash
+npx wrangler tail
+```
+Lệnh này sẽ truyền log từ worker sản xuất của bạn, hiển thị:
+- Yêu cầu và phản hồi
+- Lỗi
+- Sự kiện xoay vòng key
+- Hoạt động lưu trữ KV
 
-## Contributing
+Nhấn Ctrl+C để dừng luồng log.
 
-Contributions are welcome! Please open an issue or submit a pull request for any bugs, features, or improvements.
+## How It Works (Cách Hoạt Động)
 
-## License
+1.  Một client gửi yêu cầu đến URL của Cloudflare Worker.
+2.  Trình xử lý `fetch` của Worker nhận yêu cầu.
+3.  `KeyManager` truy xuất danh sách các API key và chỉ mục xoay vòng hiện tại từ namespace `GEMINI_KEYS` KV.
+4.  Nó chọn API key tiếp theo theo kiểu round-robin và cập nhật chỉ mục trong KV cho yêu cầu tiếp theo.
+5.  Worker chuyển tiếp yêu cầu gốc đến điểm cuối Gemini API thực tế (`https://generativelanguage.googleapis.com`), nối thêm API key đã chọn làm tham số truy vấn.
+6.  Phản hồi từ Gemini API được truyền trực tiếp trở lại client thông qua Worker.
+
+## Contributing (Đóng Góp)
+
+Chúng tôi hoan nghênh các đóng góp! Vui lòng mở một issue hoặc gửi một pull request cho bất kỳ lỗi, tính năng hoặc cải tiến nào.
+
+## License (Giấy Phép)
 
 MIT
