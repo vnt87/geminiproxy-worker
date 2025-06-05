@@ -75,6 +75,31 @@ Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-w
         ```
         *Lưu ý: Đảm bảo `wrangler.toml` được cấu hình chính xác với binding `GEMINI_KEYS` trước khi chạy lệnh này.*
 
+### Script Quản Lý Key
+
+Chúng tôi cung cấp các script để đơn giản hóa việc quản lý key:
+
+1. **update-keys.sh** (Linux/Mac):
+   ```bash
+   ./update-keys.sh
+   ```
+   Yêu cầu: cài đặt jq (`brew install jq` hoặc `sudo apt-get install jq`)
+
+2. **update-keys.bat** (Windows):
+   ```cmd
+   update-keys.bat
+   ```
+   Yêu cầu: cài đặt jq cho Windows
+
+Các script này sẽ:
+- Kiểm tra các file cấu hình cần thiết
+- Sao chép từ file .example nếu file gốc không tồn tại
+- Kiểm tra cấu trúc JSON
+- Chuyển đổi key sang định dạng bulk KV
+- Thực thi lệnh Wrangler KV bulk put
+
+Với lần cài đặt đầu tiên, bạn có thể cần chỉnh sửa thủ công các file đã sao chép trước khi chạy script.
+
 ## Usage (Sử Dụng)
 
 ### Local Development (Phát Triển Cục Bộ)

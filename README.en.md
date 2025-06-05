@@ -75,6 +75,31 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
         ```
         *Note: Ensure `wrangler.toml` is correctly configured with the `GEMINI_KEYS` binding before running this.*
 
+### Key Management Scripts
+
+We provide scripts to simplify key management:
+
+1. **update-keys.sh** (Linux/Mac):
+   ```bash
+   ./update-keys.sh
+   ```
+   Requirements: jq installed (`brew install jq` or `sudo apt-get install jq`)
+
+2. **update-keys.bat** (Windows):
+   ```cmd
+   update-keys.bat
+   ```
+   Requirements: jq for Windows installed
+
+These scripts will:
+- Check for required configuration files
+- Copy from .example templates if files are missing
+- Validate JSON structure
+- Transform keys into KV bulk format
+- Execute Wrangler KV bulk put command
+
+For first-time setup, you may need to manually edit the copied files before running the scripts.
+
 ## Usage
 
 ### Local Development
