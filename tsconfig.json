@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "esnext", // Target modern JavaScript features
+    "module": "esnext", // Use ES modules
+    "moduleResolution": "node", // How modules are resolved
+    "lib": ["esnext", "webworker"], // Libraries available in the Worker environment
+    "jsx": "react-jsx", // If using JSX, configure as needed (e.g., for Hono)
+    "esModuleInterop": true, // Enables compatibility with CommonJS modules
+    "strict": true, // Enable all strict type-checking options
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Ensure consistent file naming
+    "resolveJsonModule": true, // Allow importing JSON files
+    "isolatedModules": true, // Ensure each file can be safely transpiled
+    "noEmit": true, // Wrangler handles transpilation, so TypeScript shouldn't emit files
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "types": [
+      "@cloudflare/workers-types" // Include Cloudflare Workers type definitions
+    ]
+  },
+  "include": ["src/**/*.ts"], // Which files to include in compilation
+  "exclude": ["node_modules", "dist"] // Which files/directories to exclude
+}
