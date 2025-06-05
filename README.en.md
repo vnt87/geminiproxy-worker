@@ -58,6 +58,7 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
 
 5.  **Prepare and Upload API Keys:**
     a.  Create a JSON file named `gemini-keys.json` (or use `gemini-keys.json.example` as a template) in the `geminiproxy-worker` directory. It should contain your Gemini API keys:
+
         ```json
         // gemini-keys.json
         [
@@ -75,7 +76,8 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
           }
         ]
         ```
-        **Important:** Ensure `gemini-keys.json` is listed in your `.gitignore` file to prevent committing your actual keys. A `gemini-keys.json.example` is provided.
+
+      **Important:** Ensure `gemini-keys.json` is listed in your `.gitignore` file to prevent committing your actual keys. A `gemini-keys.json.example` is provided.
 
     b.  Upload this file to your KV namespace. The key manager expects the keys to be stored under the KV key `GEMINI_API_KEYS_CONFIG`.
         ```bash

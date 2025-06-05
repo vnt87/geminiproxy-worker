@@ -54,6 +54,7 @@ Về cơ bản thì cái này chính là adapt từ [geminiproxy](https://github
 
 5.  **Prepare and Upload API Keys (Chuẩn Bị và Tải Lên API Keys):**
     a.  Tạo một tệp JSON có tên `gemini-keys.json` (hoặc sử dụng `gemini-keys.json.example` làm mẫu) trong thư mục `geminiproxy-worker`. Tệp này nên chứa các API key Gemini của bạn:
+
         ```json
         // gemini-keys.json
         [
@@ -71,7 +72,8 @@ Về cơ bản thì cái này chính là adapt từ [geminiproxy](https://github
           }
         ]
         ```
-        **Quan trọng:** Đảm bảo `gemini-keys.json` được liệt kê trong tệp `.gitignore` của bạn để tránh commit các key thực tế. Một tệp `gemini-keys.json.example` được cung cấp.
+
+      **Quan trọng:** Đảm bảo `gemini-keys.json` được liệt kê trong tệp `.gitignore` của bạn để tránh commit các key thực tế. Một tệp `gemini-keys.json.example` được cung cấp.
 
     b.  Tải tệp này lên namespace KV của bạn. Trình quản lý key mong đợi các key được lưu trữ dưới key KV `GEMINI_API_KEYS_CONFIG`.
         ```bash
