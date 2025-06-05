@@ -20,19 +20,26 @@ export async function handleProxyRequest(request: Request, env: Env, ctx: Execut
   const keyManager = new KeyManager(env);
   
   // Ensure KeyManager is initialized (loads keys and current index from KV)
-  // Using ctx.waitUntil to allow this async operation to complete
-  // even if we return a response earlier or if an error occurs.
-  // This is crucial for KV writes (like updating the index) to reliably complete.
-  ctx.waitUntil(keyManager.initialize());
+  console.log('[Proxy] Initializing KeyManager...');
+  try {
+    // Temporarily remove ctx.waitUntil for simpler debugging
+    // In production, ctx.waitUntil is important for KV writes (like updating the index) to reliably complete.
+    await keyManager.initialize();
+    console.log('[Proxy] KeyManager initialized.');
+  } catch (initError) {
+    console.error('[Proxy] CRITICAL: KeyManager initialization failed:', initError);
+    return new Response('Proxy error: KeyManager initialization failed.', { status: 500 });
+  }
   
   // Get the next API key
+  console.log('[Proxy] Attempting to get next API key...');
   const apiKey = await keyManager.getNextKey();
 
   if (!apiKey) {
     // If no API key is available (e.g., KV store is empty or inaccessible)
     // return an error response.
-    console.error('Failed to retrieve an API key. Check KV store and configuration.');
-    return new Response('Proxy error: API key not available.', { status: 500 });
+    console.error('[Proxy] CRITICAL: Failed to retrieve an API key. KeyManager.getNextKey() returned null. Check KV store, key-manager.ts logs, and configuration.');
+    return new Response('Proxy error: API key not available. KeyManager could not provide a key.', { status: 500 });
   }
 
   // Clone the original request to modify its URL
