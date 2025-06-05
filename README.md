@@ -2,15 +2,11 @@
 
 # Gemini API Proxy Worker cho Cloudflare
 
-Dự án này triển khai một Cloudflare Worker hoạt động như một reverse proxy cho Gemini API của Google. Nó cung cấp tính năng tự động xoay vòng API key sử dụng Cloudflare KV store để lưu trữ.
+Project này dành cho ai dùng Gemini free trong Cline mà suốt ngày phải vào thay API Key vì bị rate limit. Cái này cơ bản tạo ra 1 cái relay server giữa máy mình và Google Gemini endpoint, có chứa sẵn 1 list các API Keys mình có, tự động xoay vòng theo kiểu round-robin.
 
-Đây là phiên bản chuyển đổi từ TypeScript của dự án `geminiproxy` gốc dựa trên Go, được điều chỉnh để chạy trên mạng lưới edge serverless của Cloudflare.
+Về cơ bản thì cái này chính là adapt từ [geminiproxy](https://github.com/ChakshuGautam/geminiproxy). Con đấy viết bằng Go nên ai thích dùng Go hoặc deploy docker thì có thể dùng nó, cái này mình adapt lại chuyển qua TypeScript để deploy được trên hệ thống máy chủ free của Cloudflare Worker, đỡ phải deploy trên máy mình
 
-## Repository (Kho Mã Nguồn)
-
-Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-worker.git
-
-## Features (Tính Năng)
+## Features
 
 -   Proxy các yêu cầu đến Gemini API (`generativelanguage.googleapis.com`).
 -   Tự động xoay vòng qua nhiều API key của Gemini theo kiểu round-robin.
@@ -18,36 +14,37 @@ Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-w
 -   Kiến trúc stateless phù hợp với Cloudflare Workers.
 -   Minh bạch với client – client gửi yêu cầu đến URL của Worker như thể đó là Gemini API (sau khi thiết lập ban đầu).
 -   Tương thích với LiteLLM (loại bỏ header `Authorization`).
+-   Tương thích với các thư viện go-genai client.
 
-## Prerequisites (Điều Kiện Tiên Quyết)
+## Prerequisites
 
 -   Một tài khoản Cloudflare.
 -   Đã cài đặt `npm` và `Node.js`.
 -   Đã cài đặt Wrangler CLI (`npm install -g wrangler`).
--   Một hoặc nhiều API key của Gemini.
+-   Một hoặc lý tưởng là nhiều API key của Gemini.
 
-## Setup (Cài Đặt)
+## Setup
 
-1.  **Clone Repository (Sao Chép Kho Mã Nguồn)**:
+1.  **Clone Repo**:
     ```bash
     git clone https://github.com/vnt87/gemini-proxy-worker.git
     cd gemini-proxy-worker
     ```
-    *(Nếu bạn đang khởi tạo dự án này từ các tệp cục bộ hiện có và muốn kết nối với kho mã nguồn từ xa này, hãy sử dụng `git remote add origin https://github.com/vnt87/gemini-proxy-worker.git` sau khi `git init`)*
+   
 
-2.  **Install Dependencies (Cài Đặt Các Gói Phụ Thuộc):**
+2.  **Install Dependencies**
     ```bash
     npm install
     ```
 
-3.  **Create KV Namespace (Tạo Namespace KV):**
+3.  **Create KV Namespace:**
     Trong terminal của bạn, chạy lệnh:
     ```bash
     wrangler kv:namespace create GEMINI_KEYS
     ```
     Lệnh này sẽ xuất ra một `id`. Ghi lại ID này.
 
-4.  **Configure `wrangler.toml` (Cấu Hình `wrangler.toml`):**
+4.  **Configure `wrangler.toml`:**
     Mở tệp `wrangler.toml` và cập nhật phần `kv_namespaces` với `id` bạn đã nhận được:
     ```toml
     kv_namespaces = [
@@ -82,21 +79,9 @@ Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-w
         ```
         *Lưu ý: Đảm bảo `wrangler.toml` được cấu hình chính xác với binding `GEMINI_KEYS` trước khi chạy lệnh này.*
 
-### Script Quản Lý Key
+### Cập nhật key
 
-Chúng tôi cung cấp các script để đơn giản hóa việc quản lý key:
-
-1. **update-keys.sh** (Linux/Mac):
-   ```bash
-   ./update-keys.sh
-   ```
-   Yêu cầu: cài đặt jq (`brew install jq` hoặc `sudo apt-get install jq`)
-
-2. **update-keys.bat** (Windows):
-   ```cmd
-   update-keys.bat
-   ```
-   Yêu cầu: cài đặt jq cho Windows
+Khi nào cần cập nhật key thì trướt tên update file _**gemini-keys.json**_ trước, sau đó chạy file _**update-keys.sh**_ (Linux/Mac) hoặc _**update-keys.bat**_ (Windows)
 
 Các script này sẽ:
 - Kiểm tra các file cấu hình cần thiết
@@ -106,19 +91,22 @@ Các script này sẽ:
 
 Với lần cài đặt đầu tiên, bạn có thể cần chỉnh sửa thủ công các file đã sao chép trước khi chạy script.
 
-## Cấu Hình Roo Code
+## Dùng trong Roo Code hoặc Cline
 
 Để cấu hình URL endpoint trong Roo Code:
 1. Mở cài đặt Roo Code
-2. Điều hướng đến phần cấu hình API
+2. Tick vào chỗ 'Use custom base URL'
 3. Đặt endpoint thành URL Cloudflare Worker của bạn (ví dụ: `https://geminiproxy-worker.<your-subdomain>.workers.dev`)
 4. Lưu cài đặt
 
+
 ![Cài đặt Roo Code](screenshots/roo-settings.jpg)
+
+(phần Gemini API Key để nguyên cũng dc, ko có cũng ko sao vì mình ko gọi đến nó, bản thân endpoint của mình đã tích hợp sẵn các API Key rồi)
 
 ## Usage (Sử Dụng)
 
-### Local Development (Phát Triển Cục Bộ)
+### Local Development
 
 Để kiểm tra Worker cục bộ:
 ```bash
@@ -128,7 +116,7 @@ Lệnh này sẽ khởi động một máy chủ cục bộ (thường là `http
 
 Worker sẽ nối thêm API key được xoay vòng vào yêu cầu.
 
-### Deployment (Triển Khai)
+### Deployment
 
 Để triển khai Worker lên tài khoản Cloudflare của bạn:
 ```bash
@@ -136,7 +124,7 @@ wrangler deploy
 ```
 Sau khi triển khai, Wrangler sẽ cung cấp cho bạn URL của Worker đã triển khai (ví dụ: `https://geminiproxy-worker.<your-subdomain>.workers.dev`). Sử dụng URL này làm điểm cuối Gemini API trong các ứng dụng client của bạn.
 
-## Debugging (Gỡ Lỗi)
+## Debugging
 
 Để xem log thời gian thực từ worker đã triển khai của bạn:
 ```bash
@@ -150,7 +138,7 @@ Lệnh này sẽ truyền log từ worker sản xuất của bạn, hiển thị
 
 Nhấn Ctrl+C để dừng luồng log.
 
-## How It Works (Cách Hoạt Động)
+## How It Works
 
 1.  Một client gửi yêu cầu đến URL của Cloudflare Worker.
 2.  Trình xử lý `fetch` của Worker nhận yêu cầu.
@@ -159,9 +147,9 @@ Nhấn Ctrl+C để dừng luồng log.
 5.  Worker chuyển tiếp yêu cầu gốc đến điểm cuối Gemini API thực tế (`https://generativelanguage.googleapis.com`), nối thêm API key đã chọn làm tham số truy vấn.
 6.  Phản hồi từ Gemini API được truyền trực tiếp trở lại client thông qua Worker.
 
-## Contributing (Đóng Góp)
+## Contributing
 
-Chúng tôi hoan nghênh các đóng góp! Vui lòng mở một issue hoặc gửi một pull request cho bất kỳ lỗi, tính năng hoặc cải tiến nào.
+Nếu lỗi thì vô Issues gáy lên nhé các fen. Tôi ko phải dân chuyên code
 
 ## License (Giấy Phép)
 

@@ -2,9 +2,9 @@
 
 # Gemini API Proxy Worker for Cloudflare
 
-This project implements a Cloudflare Worker that acts as a reverse proxy for Google's Gemini API. It provides automatic API key rotation using Cloudflare KV store for persistence.
+This project is for those using Gemini free in Cline who need to constantly change API keys due to rate limits. It creates a relay server between your machine and Google Gemini endpoint, containing a list of your API keys that automatically rotates them in round-robin fashion.
 
-This is a TypeScript conversion of the original Go-based `geminiproxy` project, adapted to run on Cloudflare's serverless edge network.
+This is a TypeScript conversion of the original Go-based `geminiproxy` project, adapted to run on Cloudflare's serverless edge network. If you prefer Go or want to deploy via Docker, you can use the original project.
 
 ## Repository
 
@@ -18,6 +18,7 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
 -   Stateless architecture suitable for Cloudflare Workers.
 -   Transparent to clients – they make requests to the Worker URL as if it were the Gemini API (after initial setup).
 -   LiteLLM compatibility (removes `Authorization` header).
+-   Compatible with go-genai client libraries.
 
 ## Prerequisites
 
@@ -82,37 +83,27 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
         ```
         *Note: Ensure `wrangler.toml` is correctly configured with the `GEMINI_KEYS` binding before running this.*
 
-### Key Management Scripts
+### Updating Keys
 
-We provide scripts to simplify key management:
-
-1. **update-keys.sh** (Linux/Mac):
-   ```bash
-   ./update-keys.sh
-   ```
-   Requirements: jq installed (`brew install jq` or `sudo apt-get install jq`)
-
-2. **update-keys.bat** (Windows):
-   ```cmd
-   update-keys.bat
-   ```
-   Requirements: jq for Windows installed
+When you need to update keys, first update the _**gemini-keys.json**_ file, then run either _**update-keys.sh**_ (Linux/Mac) or _**update-keys.bat**_ (Windows).
 
 These scripts will:
 - Check for required configuration files
-- Copy from .example templates if files are missing
+- Copy from .example files if originals don't exist
 - Validate JSON structure
-- Execute Wrangler KV bulk put command (no transformation needed)
+- Execute Wrangler KV bulk put command (no conversion needed)
 
 For first-time setup, you may need to manually edit the copied files before running the scripts.
 
-## Roo Code Configuration
+## Using with Roo Code or Cline
 
 To configure the URL endpoint in Roo Code:
 1. Open Roo Code settings
-2. Navigate to the API configuration section
+2. Check 'Use custom base URL'
 3. Set the endpoint to your Cloudflare Worker URL (e.g., `https://geminiproxy-worker.<your-subdomain>.workers.dev`)
-4. Save the settings
+4. Save settings
+
+(You can leave the Gemini API Key field empty - our endpoint already has the API keys integrated)
 
 ![Roo Code Settings](screenshots/roo-settings.jpg)
 
