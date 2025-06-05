@@ -17,9 +17,8 @@ dist
 Thumbs.db
 
 # Secrets / Config files that should not be committed
-gemini-keys.json # Actual API keys
-wrangler.toml # Actual wrangler config with sensitive IDs
-wrangler.toml.bak # Backups that might contain secrets
+gemini-keys.json
+wrangler.toml
 
 # Log files
 *.log
@@ -33,3 +32,4 @@ pnpm-debug.log*
 .idea/
 *.sublime-project
 *.sublime-workspace
+
