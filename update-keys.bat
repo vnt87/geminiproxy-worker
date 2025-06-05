@@ -33,12 +33,5 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Transform keys into KV bulk format
-set "TMP_FILE=%temp%\gemini-keys-kv.json"
-jq -r ".keys | to_entries | map({key: (\"key_\" + (.key|tostring), value: .value}) | from_entries" gemini-keys.json > "%TMP_FILE%"
-
-:: Execute Wrangler command
-wrangler kv:bulk put --binding=GEMINI_KEYS "%TMP_FILE%"
-
-:: Cleanup
-del "%TMP_FILE%" >nul 2>&1
+:: Execute Wrangler command directly with the file
+wrangler kv:bulk put --binding=GEMINI_KEYS "gemini-keys.json"

@@ -59,13 +59,20 @@ This project is hosted at: https://github.com/vnt87/gemini-proxy-worker.git
     a.  Create a JSON file named `gemini-keys.json` (or use `gemini-keys.json.example` as a template) in the `geminiproxy-worker` directory. It should contain your Gemini API keys:
         ```json
         // gemini-keys.json
-        {
-          "keys": [
-            "AIzaSyA...key1",
-            "AIzaSyB...key2",
-            "AIzaSyC...key3"
-          ]
-        }
+        [
+          {
+            "key": "key_0",
+            "value": "AIzaSyA...key1"
+          },
+          {
+            "key": "key_1",
+            "value": "AIzaSyB...key2"
+          },
+          {
+            "key": "key_2",
+            "value": "AIzaSyC...key3"
+          }
+        ]
         ```
         **Important:** Ensure `gemini-keys.json` is listed in your `.gitignore` file to prevent committing your actual keys. A `gemini-keys.json.example` is provided.
 
@@ -95,10 +102,19 @@ These scripts will:
 - Check for required configuration files
 - Copy from .example templates if files are missing
 - Validate JSON structure
-- Transform keys into KV bulk format
-- Execute Wrangler KV bulk put command
+- Execute Wrangler KV bulk put command (no transformation needed)
 
 For first-time setup, you may need to manually edit the copied files before running the scripts.
+
+## Roo Code Configuration
+
+To configure the URL endpoint in Roo Code:
+1. Open Roo Code settings
+2. Navigate to the API configuration section
+3. Set the endpoint to your Cloudflare Worker URL (e.g., `https://geminiproxy-worker.<your-subdomain>.workers.dev`)
+4. Save the settings
+
+![Roo Code Settings](screenshots/roo-settings.jpg)
 
 ## Usage
 

@@ -31,12 +31,5 @@ if ! jq empty gemini-keys.json 2>/dev/null; then
   exit 1
 fi
 
-# Transform keys into KV bulk format
-TMP_FILE=$(mktemp)
-jq -r '.keys | to_entries | map({key: ("key_" + (.key|tostring), value: .value}) | from_entries' gemini-keys.json > "$TMP_FILE"
-
-# Execute Wrangler command
-wrangler kv:bulk put --binding=GEMINI_KEYS "$TMP_FILE"
-
-# Cleanup
-rm "$TMP_FILE"
+# Execute Wrangler command directly with the file
+wrangler kv:bulk put --binding=GEMINI_KEYS "gemini-keys.json"

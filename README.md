@@ -59,13 +59,20 @@ Dự án này được lưu trữ tại: https://github.com/vnt87/gemini-proxy-w
     a.  Tạo một tệp JSON có tên `gemini-keys.json` (hoặc sử dụng `gemini-keys.json.example` làm mẫu) trong thư mục `geminiproxy-worker`. Tệp này nên chứa các API key Gemini của bạn:
         ```json
         // gemini-keys.json
-        {
-          "keys": [
-            "AIzaSyA...key1",
-            "AIzaSyB...key2",
-            "AIzaSyC...key3"
-          ]
-        }
+        [
+          {
+            "key": "key_0",
+            "value": "AIzaSyA...key1"
+          },
+          {
+            "key": "key_1",
+            "value": "AIzaSyB...key2"
+          },
+          {
+            "key": "key_2",
+            "value": "AIzaSyC...key3"
+          }
+        ]
         ```
         **Quan trọng:** Đảm bảo `gemini-keys.json` được liệt kê trong tệp `.gitignore` của bạn để tránh commit các key thực tế. Một tệp `gemini-keys.json.example` được cung cấp.
 
@@ -95,10 +102,19 @@ Các script này sẽ:
 - Kiểm tra các file cấu hình cần thiết
 - Sao chép từ file .example nếu file gốc không tồn tại
 - Kiểm tra cấu trúc JSON
-- Chuyển đổi key sang định dạng bulk KV
-- Thực thi lệnh Wrangler KV bulk put
+- Thực thi lệnh Wrangler KV bulk put (không cần chuyển đổi)
 
 Với lần cài đặt đầu tiên, bạn có thể cần chỉnh sửa thủ công các file đã sao chép trước khi chạy script.
+
+## Cấu Hình Roo Code
+
+Để cấu hình URL endpoint trong Roo Code:
+1. Mở cài đặt Roo Code
+2. Điều hướng đến phần cấu hình API
+3. Đặt endpoint thành URL Cloudflare Worker của bạn (ví dụ: `https://geminiproxy-worker.<your-subdomain>.workers.dev`)
+4. Lưu cài đặt
+
+![Cài đặt Roo Code](screenshots/roo-settings.jpg)
 
 ## Usage (Sử Dụng)
 

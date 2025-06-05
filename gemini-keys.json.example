@@ -1,9 +1,22 @@
-{
-  "keys": [
-    "YOUR_GEMINI_API_KEY_1_HERE",
-    "YOUR_GEMINI_API_KEY_2_HERE",
-    "YOUR_GEMINI_API_KEY_3_HERE",
-    "YOUR_GEMINI_API_KEY_4_HERE",
-    "YOUR_GEMINI_API_KEY_5_HERE"
-  ]
-}
+[
+  {
+    "key": "key_0",
+    "value": "YOUR_GEMINI_API_KEY_1_HERE"
+  },
+  {
+    "key": "key_1",
+    "value": "YOUR_GEMINI_API_KEY_2_HERE"
+  },
+  {
+    "key": "key_2",
+    "value": "YOUR_GEMINI_API_KEY_3_HERE"
+  },
+  {
+    "key": "key_3",
+    "value": "YOUR_GEMINI_API_KEY_4_HERE"
+  },
+  {
+    "key": "key_4",
+    "value": "YOUR_GEMINI_API_KEY_5_HERE"
+  }
+]
