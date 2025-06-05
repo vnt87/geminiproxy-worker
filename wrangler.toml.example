@@ -1,0 +1,27 @@
+name = "geminiproxy-worker"
+compatibility_date = "2025-06-05" # Or your project's start date
+
+# Specifies the main entry point for your Worker
+main = "src/index.ts"
+
+# KV Namespace binding
+# 1. Create this namespace in your Cloudflare account:
+#    wrangler kv:namespace create GEMINI_KEYS
+# 2. Update the 'id' below with the one provided by the command.
+kv_namespaces = [
+  { binding = "GEMINI_KEYS", id = "YOUR_KV_NAMESPACE_ID_HERE" }
+]
+
+# Optional: Environment variables
+# [vars]
+# MY_VARIABLE = "example_value"
+
+# Optional: Build configuration
+# [build]
+# command = "npm run build" # if you have a build step
+# upload.format = "service-worker" # or "modules"
+
+# Optional: Dev server configuration
+# [dev]
+# port = 8787
+# local_protocol = "http"
